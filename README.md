@@ -1,0 +1,2 @@
+# Projekt-zaliczeniowy
+Generator wykresów
