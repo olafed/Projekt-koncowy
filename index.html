@@ -4,20 +4,37 @@
 		<meta charset="UTF-8">
 		<title>Canvas ćwiczenia</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 		<link rel="stylesheet" type="text/css" href="css/styles.css">
 	</head>
 	<body>
 
-		<div class="fluid-container">
+		<div class="container-fluid">
 			<div class="row">
 				<div class="col-md-6">
 					<canvas id="testCanvas">Twoja przeglądarka nie obsługuje canvas</canvas>
 				</div>
 				<div class="col-md-6">
+					<div class="alert alert-dark">
+							Podaj parametry potrzebne do narysowania wykresu:
+							<ul>
+									<li>Wartość (liczba całkowita)</li>
+									<li>Opis</li>
+									<li>Kolor</li>
+							</ul>
+					</div>
 					<form>
-						<label>Podaj wartość:</label>
-						<input type=number></input>
+						<div class="form-inline">
+							<label class="mr-sm-2 mb-2" for="value-1">Wartość:</label>
+							<input type="tel" maxlength="3" min="0" max="100" size="3" class="mr-sm-2 mb-2 form-control" id="value-1" name="value-1">
+							<label class="mr-sm-2 mb-2" for="description-1">Opis:</label>
+							<input type="text" class="mr-sm-2 mb-2 form-control" id="description-1" name="description-1">
+							<label class="mr-sm-2 mb-2" for="color-1">Kolor:</label>
+							<input type="color" class="mr-sm-2 mb-2" id="color-1" name="color-1">
+						</div>
+						<button class="btn mr-sm-2 mb-2 btn-primary" id="addBtn"><i class="fas fa-plus"></i>&nbsp;Dodaj</button>
+						<button class="btn mr-sm-2 mb-2 btn-success" id="generateBtn"><i class="fas fa-chart-pie"></i>&nbsp;Generuj</button>
 					</form>
 				</div>
 			</div>
