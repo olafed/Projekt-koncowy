@@ -1,27 +1,33 @@
 document.addEventListener("DOMContentLoaded", function(){
 
+//zapisuję element canvas do zmiennej
 	const testCanvas = document.getElementById('testCanvas');
 
-	console.log(testCanvas);
-
-
+//ustawiam szerokość i wysokość dla elementu canvas i powierzchni rysowania
 	testCanvas.width = testCanvas.scrollWidth;
-	testCanvas.height = testCanvas.scrollHeight;
+	testCanvas.height = testCanvas.scrollWidth;
 
+//ustawiam kontekst rysowania
 	const ctx = testCanvas.getContext('2d');
 
-
+//przykładowe wartości do testów, docelowo będą pobrane z inputów
     // var data = [50, 50];
 	const data = [10, 10, 20, 30, 20, 10];
 	// var data = [30, 30, 30, 10];
 	// var data = [20, 20, 20, 20, 20];
 
-	function createJson(array, posX, posY, radiusLength) {
+
+//funkcja generująca obiekty z danych pobieranych z inputów, docelowo ma przyjmować tablicę, labelki oraz kolory jeżeli użytkownik tak zadecyduje
+
+	function createJson(array) {
 		let dataArray = [];
 		let a = 0;
 		let b = 0;
-		array.forEach(function(element) {
+		const posX = testCanvas.width/2;
+		const posY = testCanvas.height/2;
+		const radiusLength = testCanvas.width/4;
 
+		array.forEach(function(element) {
 			let red = Math.floor(Math.random() * 255);
 			let green = Math.floor(Math.random() * 255);
 			let blue = Math.floor(Math.random() * 255);
@@ -34,69 +40,93 @@ document.addEventListener("DOMContentLoaded", function(){
 		return dataArray;
 	}
 
-	const jsonArr = createJson(data, 400, 300, 200);
+//wywołanie funkcji, która tworzy tablicę - podpiąć ją pod przycisk wyślij dane
+	const jsonArr = createJson(data);
+
+//funkcje wspólna dla wykresu kołowego i wykresu "pączek"
+
+	function drawPiece(element){
+		ctx.fillStyle = element.color;
+		ctx.beginPath();
+		ctx.arc(element.x, element.y, element.radius, element.start, element.start + element.speed);
+		ctx.lineTo(element.x, element.y);
+		ctx.fill();
+		element.speed += (element.stop-element.start)/100;
+	}
+
+	function addTextToPiece(element){
+		let moveX = Math.cos(element.start + (element.stop - element.start)/2) * element.radius + testCanvas.width/2;
+		let moveY = Math.sin(element.start + (element.stop - element.start)/2) * element.radius + testCanvas.height/2;
+		let lineToX = Math.cos(element.start + (element.stop - element.start)/2) * (element.radius * 1.2) + testCanvas.width/2;
+		let lineToY = Math.sin(element.start + (element.stop - element.start)/2) * (element.radius * 1.2) + testCanvas.height/2;
+		let textX = Math.cos(element.start + (element.stop - element.start)/2) * (element.radius * 1.3) + testCanvas.width/2;
+		let textY = Math.sin(element.start + (element.stop - element.start)/2) * (element.radius * 1.3) + testCanvas.height/2;
+		let fontSize = (testCanvas.width/2) / 10;
+		let text = element.value + "%";
+		ctx.font = fontSize + "px Calibri";
+		ctx.fillStyle = element.color;
+		ctx.strokeStyle = "lightgrey";
+		ctx.beginPath();
+		ctx.moveTo(moveX, moveY);
+		ctx.lineTo(lineToX, lineToY);
+		ctx.stroke();
+		ctx.textAlign = "center";
+		ctx.textBaseline="middle";
+		ctx.fillText(text, textX, textY);
+	}
 
 
-    // console.log(jsonArr);
-
+// obiekt animowany wykres kołowy
 	class AnimatedPieChart {
 		constructor(arr){
-			// this.boundUpdate = this.update.bind(this);
 			this.pieces = arr;
-			console.log(this.pieces)
 		}
 		animatePieChart = () => {
 			ctx.clearRect(0, 0, testCanvas.width, testCanvas.height);
 
-			// console.log(this)
-			this.pieces.forEach((element) => {
-				ctx.fillStyle = element.color;
-				ctx.beginPath();
-				ctx.arc(element.x, element.y, element.radius, element.start, element.start + element.speed);
-				ctx.lineTo(element.x, element.y);
-				ctx.fill();
-				element.speed += (element.stop-element.start)/100;
-			});
-
-			ctx.fillStyle = "white";
-			ctx.beginPath();
-			ctx.arc(400, 300, 160, 0, Math.PI * 2);
-			ctx.fill();
+			this.pieces.forEach(drawPiece);
 
 			if (Math.round((this.pieces[0].start + this.pieces[0].speed)*1000) / 1000 <= Math.round(this.pieces[0].stop * 1000) / 1000) {
-				// console.log(this.pieces[0].start + this.pieces[0].speed, this.pieces[0].stop);
 				window.requestAnimationFrame(this.animatePieChart);
-				// console.log(this);
 			} else {
-				// console.log(this.pieces[0].speed);
 				window.cancelAnimationFrame(this.animatePieChart);
-							// console.log(this.pieces);
-	            this.pieces.forEach((element) => {
-	                ctx.font = "20px Georgia";
-	                ctx.fillStyle = element.color;
-	                let text = element.value + "%";
-	                let moveX = Math.cos(element.start + (element.stop - element.start)/2) * element.radius + 400;
-	                let moveY = Math.sin(element.start + (element.stop - element.start)/2) * element.radius + 300;
-	                let lineToX = Math.cos(element.start + (element.stop - element.start)/2) * (element.radius * 1.2) + 400;
-	                let lineToY = Math.sin(element.start + (element.stop - element.start)/2) * (element.radius * 1.2) + 300;
-	                let textX = Math.cos(element.start + (element.stop - element.start)/2) * (element.radius * 1.3) + 400;
-	                let textY = Math.sin(element.start + (element.stop - element.start)/2) * (element.radius * 1.3) + 300;
-	                ctx.strokeStyle = "lightgrey";
-									ctx.shadowBlur=0;
-									ctx.shadowColor="black";
-	                ctx.beginPath();
-	                ctx.moveTo(moveX, moveY);
-	                ctx.textAlign = "center";
-	                ctx.textBaseline="middle";
-	                ctx.fillText(text, textX, textY);
-	                ctx.lineTo(lineToX, lineToY);
-	                ctx.stroke();
-	            })
+				this.pieces.forEach(addTextToPiece);
 			}
 		}
 	};
 
-	let animation = new AnimatedPieChart(jsonArr);
+// obiekt animowany wykres "pączek"
+	class AnimatedDonutChart {
+		constructor(arr){
+			this.pieces = arr;
+		}
+		animateDonutChart = () => {
+			ctx.clearRect(0, 0, testCanvas.width, testCanvas.height);
 
-	animation.animatePieChart();
+			this.pieces.forEach(drawPiece);
+
+// do wykresu "pączek"
+			ctx.fillStyle = "white";
+			ctx.beginPath();
+			let whiteRadius = testCanvas.width/4 * 0.75;
+			console.log(whiteRadius);
+			ctx.arc(testCanvas.width/2, testCanvas.height/2, whiteRadius, 0, Math.PI * 2);
+			ctx.fill();
+
+			if (Math.round((this.pieces[0].start + this.pieces[0].speed)*1000) / 1000 <= Math.round(this.pieces[0].stop * 1000) /1000) {
+				window.requestAnimationFrame(this.animateDonutChart);
+			} else {
+				window.cancelAnimationFrame(this.animateDonutChart);
+				this.pieces.forEach(addTextToPiece);
+			}
+		}
+	};
+
+	// let animation = new AnimatedPieChart(jsonArr);
+	//
+	// animation.animatePieChart();
+
+	let animation = new AnimatedDonutChart(jsonArr);
+
+	animation.animateDonutChart();
 });

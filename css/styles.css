@@ -1,5 +1,16 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-size: 10px;
+	font-family: Calibri, sans-serif;
+	padding: 1rem;
+}
+
 #testCanvas {
 	border: 1px solid black;
-	width: 800px;
-	height: 600px;
+	width: 100%;
 }
