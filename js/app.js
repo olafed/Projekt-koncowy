@@ -1,13 +1,10 @@
 document.addEventListener("DOMContentLoaded", function(){
 
-//zapisuję element canvas do zmiennej
 	const testCanvas = document.getElementById('testCanvas');
 
-//ustawiam szerokość i wysokość dla elementu canvas i powierzchni rysowania
 	testCanvas.width = testCanvas.scrollWidth;
 	testCanvas.height = testCanvas.scrollWidth;
 
-//ustawiam kontekst rysowania
 	const ctx = testCanvas.getContext('2d');
 
 	const addBtn = document.getElementById('addBtn');
@@ -174,9 +171,6 @@ document.addEventListener("DOMContentLoaded", function(){
 	// var data = [20, 20, 20, 20, 20];
 
 
-
-//funkcje wspólna dla wykresu kołowego i wykresu pierścieniowego
-
 	function drawPiece(element){
 		ctx.fillStyle = element.color;
 		ctx.beginPath();
@@ -237,7 +231,6 @@ document.addEventListener("DOMContentLoaded", function(){
 	}
 
 
-// obiekt animowany wykres kołowy
 	class AnimatedPieChart {
 		constructor(arr){
 			this.pieces = arr;
@@ -256,7 +249,6 @@ document.addEventListener("DOMContentLoaded", function(){
 		}
 	};
 
-// obiekt animowany wykres "pączek"
 	class AnimatedDonutChart {
 		constructor(arr){
 			this.pieces = arr;
@@ -281,24 +273,23 @@ document.addEventListener("DOMContentLoaded", function(){
 	};
 
 
-	// obiekt animowany wykres słupkowy
-		class AnimatedBarGraph {
-			constructor(arr){
-				this.pieces = arr;
-			}
-			animateBarGraph = () => {
-				ctx.clearRect(0, 0, testCanvas.width, testCanvas.height);
+	class AnimatedBarGraph {
+		constructor(arr){
+			this.pieces = arr;
+		}
+		animateBarGraph = () => {
+			ctx.clearRect(0, 0, testCanvas.width, testCanvas.height);
 
-				this.pieces.forEach(drawRectangle);
+			this.pieces.forEach(drawRectangle);
 
-				if (this.pieces[0].speedRect <= this.pieces[0].value * 5) {
-					window.requestAnimationFrame(this.animateBarGraph);
-				} else {
-					window.cancelAnimationFrame(this.animateBarGraph);
-					this.pieces.forEach(addTextToRectangle);
-				}
+			if (this.pieces[0].speedRect <= this.pieces[0].value * 5) {
+				window.requestAnimationFrame(this.animateBarGraph);
+			} else {
+				window.cancelAnimationFrame(this.animateBarGraph);
+				this.pieces.forEach(addTextToRectangle);
 			}
-		};
+		}
+	};
 
 	const formChange = new formChangeControl();
 
