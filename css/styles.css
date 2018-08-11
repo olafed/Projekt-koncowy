@@ -22,3 +22,38 @@ body {
 .alert, .btn, .form-control {
 	border-radius: 0;
 }
+
+.padding-left-medium {
+	padding-left: 30px;
+}
+
+.hidden {
+	display: none;
+}
+
+.legend {
+	padding: 5px 20px;
+	font-size: 1.25rem;
+}
+
+.legend-row {
+	height: 2.5rem;
+	display: flex;
+}
+
+.legend-row:last-of-type {
+	margin-bottom: 1.5rem;
+}
+
+.legend-dot {
+	width: 1.875rem;
+	height: 1.875rem;
+	border-radius: 50%;
+	display: inline-block;
+	margin: .75rem 1rem;
+}
+
+.legend-description {
+	display: inline-block;
+	margin: .75rem 1rem;
+}

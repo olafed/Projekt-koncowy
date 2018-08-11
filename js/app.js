@@ -11,7 +11,11 @@ document.addEventListener("DOMContentLoaded", function(){
 	const ctx = testCanvas.getContext('2d');
 
 	const addBtn = document.getElementById('addBtn');
-	const generateBtn = document.getElementById('generateBtn');
+	const removeBtn = document.getElementById('removeBtn');
+	const generateDonutBtn = document.getElementById('generateDonutBtn');
+	const generatePieBtn = document.getElementById('generatePieBtn');
+	const generateBarBtn = document.getElementById('generateBarBtn');
+	const reloadForm = document.getElementById('reloadForm');
 
 	function addFormElement(index){
 
@@ -73,53 +77,105 @@ document.addEventListener("DOMContentLoaded", function(){
 		newDiv.appendChild(newInputColor);
 	}
 
+	function removeFormElement(){
+		let toDelete = document.querySelector('.form-inline:last-of-type');
+		toDelete.parentElement.removeChild(toDelete);
+	}
+
 	class formChangeControl {
 		constructor(){
 			this.index = 1;
 			this.tableOfIndex = [this.index];
 			this.tableOfData = [];
+			this.displayData = false;
+			this.draw = false;
 		}
 		addElement = () => {
 			this.index++;
 			this.tableOfIndex.push(this.index);
-			console.log(this.index,this.tableOfIndex);
 			addFormElement(this.index);
+		}
+		removeElement = () => {
+			removeFormElement();
+			this.index--;
+			this.tableOfIndex.pop();
+		}
+		checkSumFromForm = () => {
+			let sum = 0;
+			let sumError = document.getElementById('sum-error');
+			for (let i = 1; i <= this.tableOfIndex.length; i++){
+				let dataValue = parseInt(document.getElementById('value-'+i).value);
+				sum += dataValue;
+			}
+			if (sum == 100) {
+				this.draw = true;
+				sumError.classList.add('hidden');
+			} else {
+				sumError.classList.remove('hidden');
+			}
 		}
 		createDataFromForm = () => {
 			this.tableOfData = [];
 			let a = 0;
 			let b = 0;
+			let rectX = 10;
+			let rectY = 50;
+
 			const posX = testCanvas.width/2;
 			const posY = testCanvas.height/2;
 			const radiusLength = testCanvas.width/4;
 
 			for (let i = 1; i <= this.tableOfIndex.length; i++){
 				let dataValue = document.getElementById('value-'+i).value;
-				console.log(dataValue);
 				let dataDescription = document.getElementById('description-'+i).value;
 				let dataColor = document.getElementById('color-'+i).value;
-
 				b += Math.PI * 2 * (dataValue/100);
-				this.tableOfData.push({value: dataValue, description: dataDescription, color: dataColor, x: posX, y: posY, radius: radiusLength, start: a, stop: b, speed: (b-a)/100});
+				this.tableOfData.push({
+					value: dataValue,
+					description: dataDescription,
+					color: dataColor,
+					x: posX,
+					y: posY,
+					radius: radiusLength,
+					start: a,
+					stop: b,
+					speed: (b-a)/100,
+					rectStartX: rectX,
+					rectStartY: rectY,
+					speedRect: (rectX + dataValue * 5)/100
+				});
 				a = b;
+				rectY += 55;
 			}
-			console.log(this.tableOfData[0].start);
 			return this.tableOfData;
+		}
+		displayDataFromForm = () => {
+			const form = document.querySelector('form');
+			const legend = document.querySelector('.legend');
+			const legendTitle = document.querySelector('.legend-title');
+			form.classList.add('hidden');
+			legend.classList.remove('hidden');
+			legendTitle.classList.remove('hidden');
+
+			this.tableOfData.forEach(function(element){
+				let result = document.createElement("div");
+				result.classList.add('legend-row');
+				result.innerHTML = "<p class=\"legend-dot\" style=\"background-color:" + element.color + "\"></p><p class=\"legend-description\">" + element.value + "% " + element.description + "</p>";
+				legend.appendChild(result);
+			});
 		}
 	}
 
 
-
-
 //przykładowe wartości do testów, docelowo będą pobrane z inputów
-    // var data = [50, 50];
+  // var data = [50, 50];
 	// const data = [10, 10, 20, 30, 20, 10];
 	// var data = [30, 30, 30, 10];
 	// var data = [20, 20, 20, 20, 20];
 
 
 
-//funkcje wspólna dla wykresu kołowego i wykresu "pączek"
+//funkcje wspólna dla wykresu kołowego i wykresu pierścieniowego
 
 	function drawPiece(element){
 		ctx.fillStyle = element.color;
@@ -128,6 +184,14 @@ document.addEventListener("DOMContentLoaded", function(){
 		ctx.lineTo(element.x, element.y);
 		ctx.fill();
 		element.speed += (element.stop-element.start)/100;
+	}
+
+	function drawRectangle(element){
+		ctx.fillStyle = element.color;
+		ctx.beginPath();
+		ctx.rect(element.rectStartX,element.rectStartY,element.speedRect,50);
+		ctx.fill();
+		element.speedRect += (element.value * 5)/100;
 	}
 
 	function addTextToPiece(element){
@@ -146,7 +210,6 @@ document.addEventListener("DOMContentLoaded", function(){
 		ctx.lineTo(lineToX, lineToY);
 		ctx.stroke();
 
-// do poprawienia pozycjonowanie tekstu na wykresie
 		ctx.font = fontSize + "px Calibri";
 		ctx.fillStyle = element.color;
 		if (textY < testCanvas.height * 0.3){
@@ -157,6 +220,19 @@ document.addEventListener("DOMContentLoaded", function(){
 			ctx.textBaseline="middle";
 		}
 		ctx.textAlign = "center";
+		ctx.fillText(text, textX, textY);
+	}
+
+
+	function addTextToRectangle(element){
+		let fontSize = (testCanvas.width/2) / 10;
+		let text = element.value + "%";
+		let textX = element.rectStartX + element.value * 5 + 10;
+		let textY = element.rectStartY;
+		ctx.font = fontSize + "px Calibri";
+		ctx.fillStyle = element.color;
+		ctx.textBaseline="top";
+		ctx.textAlign = "start";
 		ctx.fillText(text, textX, textY);
 	}
 
@@ -204,10 +280,25 @@ document.addEventListener("DOMContentLoaded", function(){
 		}
 	};
 
-	// let animation = new AnimatedPieChart(jsonArr);
-	//
-	// animation.animatePieChart();
-	//
+
+	// obiekt animowany wykres słupkowy
+		class AnimatedBarGraph {
+			constructor(arr){
+				this.pieces = arr;
+			}
+			animateBarGraph = () => {
+				ctx.clearRect(0, 0, testCanvas.width, testCanvas.height);
+
+				this.pieces.forEach(drawRectangle);
+
+				if (this.pieces[0].speedRect <= this.pieces[0].value * 5) {
+					window.requestAnimationFrame(this.animateBarGraph);
+				} else {
+					window.cancelAnimationFrame(this.animateBarGraph);
+					this.pieces.forEach(addTextToRectangle);
+				}
+			}
+		};
 
 	const formChange = new formChangeControl();
 
@@ -216,12 +307,52 @@ document.addEventListener("DOMContentLoaded", function(){
 		formChange.addElement();
 	});
 
-	generateBtn.addEventListener('click', (e) => {
+	removeBtn.addEventListener('click', (e) => {
 		e.preventDefault();
-		formChange.createDataFromForm();
-		console.log(formChange.tableOfData);
-		let animation = new AnimatedDonutChart(formChange.tableOfData);
-		animation.animateDonutChart();
+		formChange.removeElement();
+	});
+
+	generateDonutBtn.addEventListener('click', (e) => {
+		formChange.checkSumFromForm();
+		if (formChange.draw == true) {
+			formChange.createDataFromForm();
+			if (formChange.displayData == false) {
+						formChange.displayDataFromForm();
+						formChange.displayData = true;
+			}
+			let animation = new AnimatedDonutChart(formChange.tableOfData);
+			animation.animateDonutChart();
+		}
+	});
+
+	generatePieBtn.addEventListener('click', (e) => {
+		formChange.checkSumFromForm();
+		if (formChange.draw == true) {
+			formChange.createDataFromForm();
+			if (formChange.displayData == false) {
+						formChange.displayDataFromForm();
+						formChange.displayData = true;
+			}
+			let animation = new AnimatedPieChart(formChange.tableOfData);
+			animation.animatePieChart();
+		}
+	});
+
+	generateBarBtn.addEventListener('click', (e) => {
+		formChange.checkSumFromForm();
+		if (formChange.draw == true) {
+			formChange.createDataFromForm();
+			if (formChange.displayData == false) {
+						formChange.displayDataFromForm();
+						formChange.displayData = true;
+			}
+			let animation = new AnimatedBarGraph(formChange.tableOfData);
+			animation.animateBarGraph();
+		}
+	});
+
+	reloadForm.addEventListener('click', (e) => {
+		location.reload();
 	});
 
 });

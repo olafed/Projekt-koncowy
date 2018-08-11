@@ -16,14 +16,16 @@
 					<canvas id="testCanvas">Twoja przeglądarka nie obsługuje canvas</canvas>
 				</div>
 				<div class="col-md-6">
-					<div class="alert alert-dark">
-							Podaj parametry potrzebne do narysowania wykresu:
+					<div class="alert alert-dark padding-left-medium">
+							<p>Podaj parametry potrzebne do narysowania wykresu:</p>
 							<ul>
 									<li>Wartość (liczba całkowita)</li>
 									<li>Opis</li>
 									<li>Kolor</li>
 							</ul>
+							<p>Podane liczby muszą sumować się do 100.</p>
 					</div>
+					<div class="alert alert-danger hidden" id="sum-error">Podane liczby muszą sumować się do 100.</div>
 					<form>
 						<div class="form-inline">
 							<label class="mr-sm-2 mb-2" for="value-1">Wartość:</label>
@@ -34,8 +36,14 @@
 							<input type="color" class="mr-sm-2 mb-2" id="color-1" name="color-1">
 						</div>
 						<button class="btn mr-sm-2 mb-2 btn-primary" id="addBtn"><i class="fas fa-plus"></i>&nbsp;Dodaj</button>
-						<button class="btn mr-sm-2 mb-2 btn-success" id="generateBtn"><i class="fas fa-chart-pie"></i>&nbsp;Generuj</button>
+						<button class="btn mr-sm-2 mb-2 btn-primary" id="removeBtn"><i class="fas fa-trash"></i>&nbsp;Usuń</button>
 					</form>
+					<h4 class="legend-title hidden alert alert-info">Legenda:</h4>
+					<div class="legend hidden"></div>
+					<button class="btn mr-sm-2 mb-2 btn-success" id="generatePieBtn"><i class="fas fa-chart-pie"></i>&nbsp;Wykres kołowy</button>
+					<button class="btn mr-sm-2 mb-2 btn-success" id="generateDonutBtn"><i class="fas fa-chart-pie"></i>&nbsp;Wykres pierścieniowy</button>
+					<button class="btn mr-sm-2 mb-2 btn-success" id="generateBarBtn"><i class="fas fa-chart-bar"></i>&nbsp;Wykres słupkowy</button>
+					<button class="btn mr-sm-2 mb-2 btn-light" id="reloadForm"><i class="fas fa-sync-alt"></i>&nbsp;Nowy wykres</button>
 				</div>
 			</div>
 		</div>
