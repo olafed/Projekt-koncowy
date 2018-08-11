@@ -1,2 +1,2 @@
-# Projekt-zaliczeniowy
+# Projekt-koncowy
 Generator wykresów
